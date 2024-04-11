@@ -1,23 +1,15 @@
 local M = {}
 
 local default_config = {
-    template_dirs = {},
-    file_paths = {},
+    template_dirs = {
+        fake = 'templates/fake',
+    },
+    file_paths = {
+        fake = 'fake.ex',
+    },
 }
 M.config = default_config
 
-function M.setup(config)
-    if config.template_dirs then
-        for key, value in pairs(config.template_dirs) do
-            M.config.template_dirs[key] = value
-        end
-    end
-    if config.file_paths then
-        for key, value in pairs(config.file_paths) do
-            M.config.file_paths[key] = value
-        end
-    end
-end
 
 
 local function setup_template_loader()
@@ -27,7 +19,7 @@ local function setup_template_loader()
     end
 
     local function load_template_with_fzf(template_dir)
-        template_dir = vim.fn.expand(template_dir) -- 展开路径中的~等特殊字符
+        template_dir = vim.fn.expand(template_dir)
         local fzf_command = 'ls -1 ' .. template_dir
 
         vim.call('fzf#run', vim.fn['fzf#wrap']({
@@ -62,7 +54,18 @@ local function setup_template_loader()
     return load_template
 end
 
--- 获取可调用的加载模板函数
 M.load_template = setup_template_loader()
+
+function M.setup(config)
+    M.config = vim.tbl_deep_extend("force", M.config, config or {})
+
+    vim.api.nvim_create_user_command(
+        'LoadTemplate',
+        function(opts)
+            M.load_template(opts.args)
+        end,
+        {nargs = "*"}
+    )
+end
 
 return M
