@@ -1,0 +1,17 @@
+build*
+*/build
+.root/
+.vscode/
+.ccls
+*.out
+*.o
+*.so
+*.a
+*.tasks
+*.vimrc
+.vimspector.json
+.vim-bookmarks
+compile_commands.json
+.python-version
+.envrc
+
